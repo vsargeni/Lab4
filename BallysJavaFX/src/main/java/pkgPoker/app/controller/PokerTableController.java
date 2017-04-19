@@ -1,17 +1,14 @@
 package pkgPoker.app.controller;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.UUID;
 
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -22,11 +19,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Duration;
 import pkgPoker.app.MainApp;
-import pkgPokerEnum.eAction;
-import pkgPokerEnum.eGame;
+import pkgPoker.app.model.PokerHub;
 import pkgPokerBLL.Action;
 import pkgPokerBLL.GamePlay;
+import pkgPokerBLL.Player;
 import pkgPokerBLL.Table;
+import pkgPokerEnum.eAction;
+import pkgPokerEnum.eGame;
 
 public class PokerTableController implements Initializable {
 
@@ -66,12 +65,10 @@ public class PokerTableController implements Initializable {
 	@FXML
 	private ToggleButton btnPos2SitLeave;
 
-
 	@FXML
 	private Label lblPos1Name;
 	@FXML
 	private Label lblPos2Name;
-
 
 	@FXML
 	private HBox hBoxDeck;
@@ -102,14 +99,35 @@ public class PokerTableController implements Initializable {
 	}
 
 	public void btnSitLeave_Click(ActionEvent event) {
+		ToggleButton btn = (ToggleButton) event.getSource();
+		eAction action = null;
+		if (btn.getText().equals("Sit")) {
+			action = eAction.Sit;
+		} else if (btn.getText().equals("Leave")) {
+			action = eAction.Leave;
+		}
+		switch (btn.getId()) {
 
-		// Set the PlayerPosition in the Player
-		mainApp.getPlayer().setiPlayerPosition(1);
-
-		// Build an Action message
-		Action act = new Action(eAction.Sit, mainApp.getPlayer());
-
-		// Send the Action to the Hub
+		case "btnPos1SitLeave":
+			if (action == eAction.Sit) {
+				mainApp.getPlayer().setiPlayerPosition(1);
+				btn.getText().equals("Leave");
+			} else {
+				mainApp.getPlayer().setiPlayerPosition(0);
+				btn.getText().equals("Sit");
+			}
+			break;
+		case "btnPos2SitLeave":
+			if (action == eAction.Sit) {
+				mainApp.getPlayer().setiPlayerPosition(2);
+				btn.getText().equals("Leave");
+			} else {
+				mainApp.getPlayer().setiPlayerPosition(0);
+				btn.getText().equals("Sit");
+			}
+			break;
+		}
+		Action act = new Action(action, MainApp.getPlayer());
 		mainApp.messageSend(act);
 	}
 
@@ -147,7 +165,7 @@ public class PokerTableController implements Initializable {
 			return hboxP1Cards;
 		case 2:
 			return hboxP2Cards;
- 
+
 		default:
 			return null;
 		}
@@ -155,11 +173,41 @@ public class PokerTableController implements Initializable {
 	}
 
 	public void Handle_TableState(Table HubPokerTable) {
+		Iterator it = HubPokerTable.getHmPlayer().entrySet().iterator();
+		btnStartGame.setVisible(false);
+		getPlayerLabel(1).setText("");
+		getPlayerLabel(2).setText("");
+		getSitLeave(1).setVisible(true);
+		getSitLeave(2).setVisible(true);
+		getSitLeave(1).setText("Sit");
+		getSitLeave(2).setText("Sit");
+		while (it.hasNext()) {
+			Map.Entry pair = (Map.Entry) it.next();
+			Player p = (Player) pair.getValue();
+			getPlayerLabel(p.getiPlayerPosition()).setText(p.getPlayerName());
+
+			if (p.getiPokerClientID() == mainApp.getPlayer().getiPokerClientID()) {
+				getSitLeave(p.getiPlayerPosition()).setVisible(true);
+				getSitLeave(p.getiPlayerPosition()).setText("Leave");
+				btnStartGame.setVisible(true);
+				for (int i = 1; i < 3; i++) {
+					if (i != p.getiPlayerPosition()) {
+						getSitLeave(i).setVisible(false);
+					}
+				}
+			}
+
+			else {
+				getSitLeave(p.getiPlayerPosition()).setVisible(false);
+
+			}
+
+		}
 
 	}
 
 	public void Handle_GameState(GamePlay HubPokerGame) {
-		
+
 	}
 
 	private ImageView BuildImage(int iCardNbr) {

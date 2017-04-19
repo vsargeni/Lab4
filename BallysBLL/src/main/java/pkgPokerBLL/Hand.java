@@ -62,12 +62,12 @@ public class Hand {
 		Collections.sort(ExplodedHands, Hand.HandRank);
 		
 		//	Return best hand.  
-		//	TODO: Fix...  what to do if there is a tie?
+
 		return ExplodedHands.get(0);
 	}
 
 	
-	//TODO: one hand is passed in, 1, 52, 2704, etc are passed back
+	
 	//		No jokers, 'ReturnHands' should have one hand
 	//		One Wild/joker 'ReturnHands' should have 52 hands, etc
 	
@@ -224,7 +224,7 @@ public class Hand {
 
 	}
 
-	// TODO: Implement This Method
+	
 	public static boolean isHandFourOfAKind(Hand h, HandScore hs) {
 
 		boolean isHandFourOfAKind = false;

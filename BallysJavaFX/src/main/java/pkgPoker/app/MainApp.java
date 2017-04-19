@@ -52,20 +52,20 @@ public class MainApp extends Application {
 	private BorderPane rootLayout;
 
 	private PokerHub pHub = null;
-	private PokerClient pClient = null;
+	private static PokerClient pClient = null;
 
 	private PokerTableController pokerController = null;
 	private RootLayoutController rootController = null;
 
 	private boolean isServer = false;
 
-	private Player appPlayer;
+	private static Player appPlayer;
 
 	public int GetPlayerID()
 	{
 		return pClient.getID();
 	}
-	public Player getPlayer() {
+	public static Player getPlayer() {
 		return appPlayer;
 	}
 
@@ -237,7 +237,7 @@ public class MainApp extends Application {
 		//connection.closeConnection();
 	}
 
-	public void messageSend(final Object message)
+	public static void messageSend(final Object message)
 	{
 		System.out.println("Sending message from MainApp");
 		pClient.messageSend(message);	
